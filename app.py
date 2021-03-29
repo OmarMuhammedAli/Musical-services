@@ -2,36 +2,26 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from collections import defaultdict
-import json
-from os import name
-import dateutil.parser
-import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
-from sqlalchemy.orm import backref
 from forms import *
 from datetime import datetime
-from models import *
 from sys import exc_info
+
+
+from models import *
+from filters import format_datetime
+
+
 
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
 
 
-def format_datetime(value, format='medium'):
-    date = dateutil.parser.parse(value)
-    if format == 'full':
-        format = "EEEE MMMM, d, y 'at' h:mma"
-    elif format == 'medium':
-        format = "EE MM, dd, y h:mma"
-    return babel.dates.format_datetime(date, format)
-
-
 app.jinja_env.filters['datetime'] = format_datetime
+
 
 #----------------------------------------------------------------------------#
 # Controllers.
@@ -284,7 +274,7 @@ def show_artist(artist_id):
         'past_shows_count': len(past_shows),
         'upcoming_shows_count': len(upcoming_shows)
     } for artist in artists]
-    # debug from starter code if there's a bug.
+    
     data = list(filter(lambda d: d['id'] ==
                        artist_id, unfiltered_data))[0]
     return render_template('pages/show_artist.html', artist=data)
