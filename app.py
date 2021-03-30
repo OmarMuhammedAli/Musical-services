@@ -14,7 +14,6 @@ from models import *
 from filters import format_datetime
 
 
-
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -86,8 +85,10 @@ def show_venue(venue_id):
     Shows a specific venue by venue_id. The data structure given was considered in implementation.
     """
     venues = Venue.query.all()
-    past_shows = db.session.query(Show).join(Venue).filter(Show.start_time <= datetime.now(), Venue.id == venue_id).all()
-    upcoming_shows = db.session.query(Show).join(Venue).filter(Show.start_time > datetime.now(), Venue.id == venue_id).all()
+    past_shows = db.session.query(Show).join(Venue).filter(
+        Show.start_time <= datetime.now(), Venue.id == venue_id).all()
+    upcoming_shows = db.session.query(Show).join(Venue).filter(
+        Show.start_time > datetime.now(), Venue.id == venue_id).all()
     unfiltered_data = [{
         'id': venue.id,
         'name': venue.name,
@@ -192,14 +193,14 @@ def delete_venue(venue_id):
     Handles the deletion of any venue. AJAX UI support was implemented in the appropriate 
     show_venue template
     """
-    try: 
+    try:
         Show.query.filter_by(venue_id=venue_id).delete()
         Venue.query.filter_by(id=venue_id).delete()
         db.session.commit()
     except:
         db.session.rollback()
         print(exc_info())
-    finally: 
+    finally:
         db.session.close()
     return render_template('pages/home.html')
 
@@ -245,8 +246,10 @@ def show_artist(artist_id):
     Shows a specific artist by artist_id. The data structure given was considered in implementation.
     """
     artists = Artist.query.all()
-    past_shows = db.session.query(Show).join(Artist).filter(Show.start_time <= datetime.now(), Artist.id == artist_id).all()
-    upcoming_shows = db.session.query(Show).join(Artist).filter(Show.start_time > datetime.now(), Artist.id == artist_id).all()
+    past_shows = db.session.query(Show).join(Artist).filter(
+        Show.start_time <= datetime.now(), Artist.id == artist_id).all()
+    upcoming_shows = db.session.query(Show).join(Artist).filter(
+        Show.start_time > datetime.now(), Artist.id == artist_id).all()
     unfiltered_data = [{
         'id': artist.id,
         'name': artist.name,
@@ -274,7 +277,7 @@ def show_artist(artist_id):
         'past_shows_count': len(past_shows),
         'upcoming_shows_count': len(upcoming_shows)
     } for artist in artists]
-    
+
     data = list(filter(lambda d: d['id'] ==
                        artist_id, unfiltered_data))[0]
     return render_template('pages/show_artist.html', artist=data)
@@ -322,13 +325,13 @@ def edit_artist_submission(artist_id):
 def edit_venue(venue_id):
     venue = Venue.query.get(venue_id)
     form = VenueForm(obj=venue)
-    
+
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-    try: 
+    try:
         form = VenueForm(request.form)
         venue = Venue.query.get(venue_id)
         venue.name = form.name.data
@@ -436,9 +439,9 @@ def create_show_submission():
     }
     try:
         show = Show(
-            artist_id = data['artist_id'],
-            venue_id = data['venue_id'],
-            start_time = data['start_time']
+            artist_id=data['artist_id'],
+            venue_id=data['venue_id'],
+            start_time=data['start_time']
         )
         db.session.add(show)
         db.session.commit()
@@ -452,6 +455,10 @@ def create_show_submission():
         db.session.close()
     return redirect(url_for('index'))
 
+
+#----------------------------------------------------------------------------#
+# Error Handling.
+#----------------------------------------------------------------------------#
 
 
 @app.errorhandler(404)
